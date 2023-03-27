@@ -19,7 +19,7 @@ class Router {
     server.on_receive(|req, res| {
       var routes = self.method_routes[req.method]
       for path, fn in routes {
-        var matches = req.path.matches(path)
+        var matches = req.path.match(path)
         if (matches) {
           req.params = matches
           fn(req, res)
@@ -41,7 +41,22 @@ class Router {
     if (wildcard != -1 and wildcard != path.length() - 1) {
       die Exception('URL wildcard has to be the last character')
     }
-    return '/' + path.replace('/', '\\/').replace(':', '([^\/]+)').replace('*', '(.*)') + '$/'
+    
+    path = path.replace('/', '\\/').replace('*', '(?P<wildcard>.*)')
+    var names = path.matches('/:(\w+)/')
+    if (names) {
+      var reserved = { 'wildcard': nil }
+      
+      for _, name in names[1] {
+        if (reserved.get(name)) {
+          die Exception('You cannot use the same name multiple times in a router path') 
+        }
+        reserved[name] = nil
+        
+        path = path.replace(':${name}', '(?P<${name}>[^\/]+)')
+      }
+    }
+    return '/' + path + '$/'
   }
 
   _add(method, path, fn) {
