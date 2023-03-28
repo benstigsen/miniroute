@@ -1,4 +1,5 @@
 import http
+import iters
 
 class Router {
   # https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
@@ -21,7 +22,13 @@ class Router {
       for path, fn in routes {
         var matches = req.path.match(path)
         if (matches) {
-          req.params = matches
+          # TODO: Remove by version v0.0.84 # https://github.com/blade-lang/blade/issues/153
+          req.params = iters.reduce(matches.keys(), |original, key| {
+            original[is_string(key) ? key.trim() : key] = matches[key]
+            return original
+          }, {})
+
+          # req.params = matches
           fn(req, res)
           break
         }
