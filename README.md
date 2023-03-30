@@ -1,10 +1,13 @@
 # Router
-
 `router` is a tiny and lightweight routing library.
 
-## Example
+## Description
+This routing library only makes use of the `http` module and the in-built regex matching.
+It's not the most efficient way to do route matching, but for applications with few routes, it's 
+more than powerful enough, for most use-cases.
 
-```js
+## Example
+```javascript
 import router
 import mime
 
@@ -39,8 +42,32 @@ router.serve(3000)
 3. `localhost:3000/assets/css/style.css` will show `Asset css/style.css has mimetype text/css`
 2. `localhost:3000/John/Smith` will show `Hello John Smith!`
 
+## Middleware
+Middleware is supported to allow for easy logging, verification, etc.
 
-## Description
-This routing library only makes use of the `http` module and the in-built regex matching.
-It's not the most efficient way to do route matching, but for applications with few routes, it's 
-more than powerful enough, for most use-cases.
+If your middleware function returns `false`, then it won't continue.
+```python
+def log(request, response) {
+  echo '${request.ip} => ${request.path}'
+}
+
+def verify(request, response) {
+  response.headers['Content-Type'] = 'application/json'
+
+  if (request.path.starts_with('/foo')) {
+    response.write('Failed!')
+    return false
+  } else {
+    response.write('Succeeded!')
+  }
+}
+
+def homepage(request, response) {
+  response.headers['Content-Type'] = 'text/html'
+  response.write('<h1>Welcome!</h1>')
+}
+
+router.use(log) # Middleware applied to all routes
+router.get('/foo', verify, homepage) # Failed!
+router.get('/bar', verify, homepage) # Succeeded! <h1>Welcome!</h1>
+```

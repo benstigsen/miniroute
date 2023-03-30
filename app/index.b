@@ -15,11 +15,13 @@ class Router {
     'TRACE'  : {}
   }
 
+  var global_routes = []
+
   serve(port) {
     var server = http.server(port)
     server.on_receive(|req, res| {
       var routes = self.method_routes[req.method]
-      for path, fn in routes {
+      for path, arr in routes {
         var matches = req.path.match(path)
         if (matches) {
           # TODO: Remove by version v0.0.84 # https://github.com/blade-lang/blade/issues/153
@@ -28,8 +30,18 @@ class Router {
             return original
           }, {})
 
+          for fn in self.global_routes {
+            if (fn(req, res) == false) {
+              break
+            }
+          }
+
           # req.params = matches
-          fn(req, res)
+          for fn in arr {
+            if (fn(req, res) == false) {
+              break
+            }
+          }
           break
         }
       }
@@ -66,51 +78,62 @@ class Router {
     return '/' + path + '$/'
   }
 
-  _add(method, path, fn) {
+  _add(method, path, functions) {
     if (!is_string(path)) {
-      die Exception('Unexpected path type. Expected a string')
+      die Exception('Unexpected route path type. Expected a string')
     }
 
-    if (!is_function(fn)) {
-      die Exception('Unexpected function type. Expected a function')
+    for fn in functions {
+      if (!is_function(fn)) {
+        die Exception('Unexpected function type in route "${path}". Expected a function of type function(request, response)')
+      }
     }
 
-    self.method_routes[method][self.regex(path)] = fn
+    self.method_routes[method][self.regex(path)] = functions
   }
 
-  get(path, fn) {
-    self._add('GET', path, fn)
+  use(...) {
+    for fn in __args__ {
+      if (!is_function(fn)) {
+        die Exception('Unexpected function type in router.use(). Expected a function of type function(request, response)')
+      }
+    }
+    self.global_routes.extend(__args__)
   }
 
-  head(path, fn) {
-    self._add('HEAD', path, fn)
+  get(path, ...) {
+    self._add('GET', path, __args__)
+  }
+
+  head(path, ...) {
+    self._add('HEAD', path, __args__)
   }
   
-  post(path, fn) {
-    self._add('POST', path, fn)
+  post(path, ...) {
+    self._add('POST', path, __args__)
   }
 
-  put(path, fn) {
-    self._add('PUT', path, fn)
+  put(path, ...) {
+    self._add('PUT', path, __args__)
   }
 
-  delete(path, fn) {
-    self._add('DELETE', path, fn)
+  delete(path, ...) {
+    self._add('DELETE', path, __args__)
   }
   
-  connect(path, fn) {
-    self._add('CONNECT', path, fn)
+  connect(path, ...) {
+    self._add('CONNECT', path, __args__)
   }
   
-  options(path, fn) {
-    self._add('OPTIONS', path, fn)
+  options(path, ...) {
+    self._add('OPTIONS', path, __args__)
   }
 
-  patch(path, fn) {
-    self._add('PATCH', path, fn)
+  patch(path, ...) {
+    self._add('PATCH', path, __args__)
   }
 
-  trace(path, fn) {
-    self._add('TRACE', path, fn)
+  trace(path, ...) {
+    self._add('TRACE', path, __args__)
   }
 }
