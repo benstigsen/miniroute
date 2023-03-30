@@ -8,7 +8,7 @@ more than powerful enough, for most use-cases.
 
 ## Example
 ```javascript
-import router
+import router { Router }
 import mime
 
 var router = Router()
