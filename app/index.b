@@ -1,5 +1,6 @@
 import http
 import iters
+import .middleware
 
 class Router {
   # https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods

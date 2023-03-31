@@ -47,19 +47,10 @@ Middleware is supported to allow for easy logging, verification, etc.
 
 If your middleware function returns `false`, then it won't continue.
 ```python
+import router { Router, middleware }
+
 def log(request, response) {
   echo '${request.ip} => ${request.path}'
-}
-
-def verify(request, response) {
-  response.headers['Content-Type'] = 'application/json'
-
-  if (request.path.starts_with('/foo')) {
-    response.write('Failed!')
-    return false
-  } else {
-    response.write('Succeeded!')
-  }
 }
 
 def homepage(request, response) {
@@ -67,7 +58,19 @@ def homepage(request, response) {
   response.write('<h1>Welcome!</h1>')
 }
 
-router.use(log) # Middleware applied to all routes
-router.get('/foo', verify, homepage) # Failed!
-router.get('/bar', verify, homepage) # Succeeded! <h1>Welcome!</h1>
+var router = Router()
+
+# Global middleware (logging for all routes)
+router.use(log)
+
+# Basic auth middleware, login with username "foo" and password "bar"
+router.get('/', middleware.basicauth({'foo': 'bar'}), homepage)
+
+router.serve(3000)
 ```
+
+Using `router.use()` adds middleware to every single server request.
+So in the example above, every request is being printed to the console.
+
+There's also some built-in middleware like `basicauth()` making it easy
+to add login authentication to the module.
