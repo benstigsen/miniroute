@@ -6,6 +6,12 @@ def basicauth(credentials) {
     die Exception('basic_auth credentials has to be a dictionary of type {string: string}')
   }
 
+  for username, password in credentials {
+    if (!is_string(username) or !is_string(password)) {
+      die Exception('basic_auth credentials has to be a dictionary of type {string: string}')
+    }
+  }
+
   return |request, response| {
     var auth = request.headers.get('Authorization')
     if (auth == nil) {
