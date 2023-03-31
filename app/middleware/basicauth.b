@@ -1,23 +1,27 @@
 import http
 import base64
 
+def _fail(request, response) {
+  response.headers['WWW-Authenticate'] = 'Basic realm="Login Required"'
+  response.status = http.UNAUTHORIZED
+  response.write('Login Required')
+}
+
 def basicauth(credentials) {
   if (!is_dict(credentials)) {
-    die Exception('basic_auth credentials has to be a dictionary of type {string: string}')
+    die Exception('basicauth credentials has to be a dictionary of type {string: string}')
   }
 
   for username, password in credentials {
     if (!is_string(username) or !is_string(password)) {
-      die Exception('basic_auth credentials has to be a dictionary of type {string: string}')
+      die Exception('basicauth credentials has to be a dictionary of type {string: string}')
     }
   }
 
   return |request, response| {
     var auth = request.headers.get('Authorization')
     if (auth == nil) {
-      response.headers['WWW-Authenticate'] = 'Basic realm="Login Required"'
-      response.status = http.UNAUTHORIZED
-      response.write('Login Required')
+      _fail(request, response)
       return false
     }
 
@@ -27,9 +31,7 @@ def basicauth(credentials) {
 
     var credpass = credentials.get(username)
     if (credpass == nil or credpass != password) {
-      response.headers['WWW-Authenticate'] = 'Basic realm="Login Required"'
-      response.status = http.UNAUTHORIZED
-      response.write('Login Required')
+      _fail(request, response)
       return false
     }
 
