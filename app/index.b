@@ -57,22 +57,24 @@ class Router {
   }
 
   regex(path) {
-    var wildcard = path.index_of('*')
-    if (wildcard != -1 and wildcard != path.length() - 1) {
-      die Exception('URL wildcard has to be the last character')
+    path = path.replace('/', '\\/')
+
+    var reserved = {}
+
+    var wildcard = path.match('/\*(\w+)$/')
+    if (wildcard) {
+      path = path.replace(wildcard[0], '(?P<${wildcard[1]}>.*)')
+      reserved[wildcard[1]] = nil
     }
-    
-    path = path.replace('/', '\\/').replace('*', '(?P<wildcard>.*)')
+
     var names = path.matches('/:(\w+)/')
     if (names) {
-      var reserved = { 'wildcard': nil }
-      
       for _, name in names[1] {
         if (reserved.get(name)) {
           die Exception('You cannot use the same name multiple times in a router path') 
         }
         reserved[name] = nil
-        
+
         path = path.replace(':${name}', '(?P<${name}>[^\/]+)')
       }
     }

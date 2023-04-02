@@ -17,16 +17,16 @@ router.get('/', |request, response| {
   response.write('<h1>Index!</h1>')
 })
 
-# Wildcard
-router.get('/assets/*', |request, response| {
-  var path = request.params['wildcard']
+/* Wilcard Routes */
+router.get('/assets/*path', |request, response| {
+  var path = request.params['path']
   var type = mime.detect_from_name(path)
 
   response.headers['Content-Type'] = 'text/html'
   response.write('<h1>Asset ${path} has mimetype ${type}</h1>')
 })
 
-# Named
+/* Named Routes */
 router.get('/:firstname/:lastname', |request, response| {
   var firstname = request.params['firstname']
   var lastname  = request.params['lastname']
