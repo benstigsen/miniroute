@@ -1,14 +1,14 @@
-# Router
-`router` is a tiny and lightweight routing library.
-
-## Description
-This routing library only makes use of the `http` module and the in-built regex matching.
-It's not the most efficient way to do route matching, but for applications with few routes, it's 
-more than powerful enough, for most use-cases.
+# miniroute
+`miniroute` is a simple routing library with the following features:
+- Named parameters
+  - `/blog/:category/:title`
+  - `/asset/*path`
+- Middleware support (`basicauth`, `ratelimit` and custom functions)
+- No external dependencies (uses default `http` and `reflect` modules)
 
 ## Example
 ```javascript
-import router { Router }
+import miniroute { Router }
 import mime
 
 var router = Router()
@@ -42,12 +42,14 @@ router.serve(3000)
 3. `localhost:3000/assets/css/style.css` will show `Asset css/style.css has mimetype text/css`
 2. `localhost:3000/John/Smith` will show `Hello John Smith!`
 
+Wildcard parameters always have to be at the end of the URL path.
+
 ## Middleware
 Middleware is supported to allow for easy logging, verification, etc.
 
-If your middleware function returns `false`, then it won't continue.
+If your middleware function returns `false`, then it won't continue to the next method.
 ```python
-import router { Router, middleware }
+import miniroute { * } # { Router, middleware }
 
 def log(request, response) {
   echo '${request.ip} => ${request.path}'
@@ -72,5 +74,5 @@ router.serve(3000)
 Using `router.use()` adds middleware to every single server request.
 So in the example above, every request is being printed to the console.
 
-There's also some built-in middleware like `basicauth()` making it easy
-to add login authentication to the module.
+There's also some built-in middleware like `basicauth()` and `ratelimit()` making it easy
+to add login authentication and more security to the module.

@@ -1,5 +1,6 @@
 import http
 import iters
+import reflect
 import .middleware
 
 class Router {
@@ -81,15 +82,25 @@ class Router {
     return '/' + path + '$/'
   }
 
+  _verify_fn(fn) {
+    if (!is_function(fn)) {
+      die Exception('Unexpected function type in route "${path}". Expected a function of type function(request, response)')
+    }
+
+    var info = reflect.get_function_metadata(fn)
+    if (info['arity'] != 2) {
+      var msg = 'Invalid router function ${info["name"]}, expected 2 arguments (request, response) instead of ${info["arity"]}.'
+      die Exception(msg)
+    }
+  }
+
   _add(method, path, functions) {
     if (!is_string(path)) {
       die Exception('Unexpected route path type. Expected a string')
     }
 
     for fn in functions {
-      if (!is_function(fn)) {
-        die Exception('Unexpected function type in route "${path}". Expected a function of type function(request, response)')
-      }
+      self._verify_fn(fn)
     }
 
     self.method_routes[method][self.regex(path)] = functions
@@ -97,9 +108,7 @@ class Router {
 
   use(...) {
     for fn in __args__ {
-      if (!is_function(fn)) {
-        die Exception('Unexpected function type in router.use(). Expected a function of type function(request, response)')
-      }
+      self._verify_fn(fn)
     }
     self.global_routes.extend(__args__)
   }
