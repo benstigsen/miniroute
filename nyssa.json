@@ -1,7 +1,7 @@
 {
   "name": "miniroute", 
-  "version": "1.0.0", 
-  "description": "Tiny and simple HTTP router.", 
+  "version": "1.0.1",
+  "description": "Simple and tiny HTTP router.",
   "homepage": "https://github.com/BenStigsen/miniroute", 
   "tags": [
     "http", 

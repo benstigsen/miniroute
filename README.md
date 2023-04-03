@@ -7,6 +7,7 @@
 - No external dependencies (uses default `http` and `reflect` modules)
 
 ## Example
+
 ```javascript
 import miniroute { Router }
 import mime
