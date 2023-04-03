@@ -1,2 +1,2 @@
-import .basicauth { * }
+import .basicauth { basicauth }
 import .ratelimit { ratelimit }
