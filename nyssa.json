@@ -1,0 +1,16 @@
+{
+  "name": "miniroute", 
+  "version": "1.0.0", 
+  "description": "Tiny and simple HTTP router.", 
+  "homepage": "https://github.com/BenStigsen/miniroute", 
+  "tags": [
+    "http", 
+    "router"
+  ], 
+  "author": "Benjamin Stigsen", 
+  "license": "ISC", 
+  "sources": [
+    "https://nyssa.bladelang.com"
+  ], 
+  "deps": {}
+}
