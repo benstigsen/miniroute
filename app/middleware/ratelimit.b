@@ -1,8 +1,6 @@
 import http
 
 class RateLimiter {
-  var user_requests = {}
-
   RateLimiter(amount, interval) {
     if (!is_number(amount)) {
       die Exception("ratelimit amount has to be a number specifying amount of requests allowed")
@@ -12,6 +10,7 @@ class RateLimiter {
       die Exception("ratelimit interval has to be a number of seconds")
     }
 
+    self.user_requests = {}
     self.interval = interval
     self.amount = amount
   }
