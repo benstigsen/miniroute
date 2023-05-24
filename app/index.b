@@ -26,11 +26,7 @@ class Router {
       for path, arr in routes {
         var matches = req.path.match(path)
         if (matches) {
-          # TODO: Remove by version v0.0.84 # https://github.com/blade-lang/blade/issues/153
-          req.params = iters.reduce(matches.keys(), |original, key| {
-            original[is_string(key) ? key.trim() : key] = matches[key]
-            return original
-          }, {})
+          req.params = matches
 
           for fn in self.global_routes {
             if (fn(req, res) == false) {
@@ -38,7 +34,6 @@ class Router {
             }
           }
 
-          # req.params = matches
           for fn in arr {
             if (fn(req, res) == false) {
               break
