@@ -60,44 +60,38 @@ class Router {
   regex(path) {
     path = path.replace('/', '\\/')
 
-    var reserved = {}
+    var reserved = []
 
     var wildcard = path.match('/\*(\w+)$/')
     if (wildcard) {
       path = path.replace(wildcard[0], '(?P<${wildcard[1]}>.*)')
-      reserved[wildcard[1]] = nil
+      reserved.append(wildcard[1])
     }
 
     var names = path.matches('/:(\w+)/')
     if (names) {
       for _, name in names[1] {
-        if (reserved.get(name)) {
-          die Exception('You cannot use the same name multiple times in a router path') 
-        }
-        reserved[name] = nil
-
         path = path.replace(':${name}', '(?P<${name}>[^\/]+)')
+        reserved.append(name)
       }
     }
+
+    for name in reserved {
+      assert reserved.count(name) == 1, 'You cannot use the same parameter name "${name}" multiple times in a router path'
+    }
+
     return '/' + path + '$/'
   }
 
   _verify_fn(fn) {
-    if (!is_function(fn)) {
-      die Exception('Unexpected function type in route "${path}". Expected a function of type function(request, response)')
-    }
+    assert is_function(fn), 'Unexpected function type for route. Expected a function of type function(request, response)'
 
     var info = reflect.get_function_metadata(fn)
-    if (info['arity'] != 2) {
-      var msg = 'Invalid router function ${info["name"]}, expected 2 arguments (request, response) instead of ${info["arity"]}.'
-      die Exception(msg)
-    }
+    assert info['arity'] == 2, 'Invalid router function ${info["name"]}, expected 2 arguments (request, response) instead of ${info["arity"]}.'
   }
 
   _add(method, path, functions) {
-    if (!is_string(path)) {
-      die Exception('Unexpected route path type. Expected a string')
-    }
+    assert is_string(path), 'Unexpected route path type. Expected a string'
 
     for fn in functions {
       self._verify_fn(fn)
