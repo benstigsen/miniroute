@@ -18,6 +18,9 @@ class Router {
   }
 
   var global_routes = []
+  var error_fn = |err, _| {
+    die err
+  }
 
   serve(port) {
     var server = http.server(port)
@@ -44,12 +47,14 @@ class Router {
       }
     })
 
-    server.on_error(|err, _| {
-      die err
-    })
+    server.on_error(self.error_fn)
 
     echo 'server is running on http://localhost:3000'
     server.listen()
+  }
+
+  on_error(fn) {
+    self.error_fn = fn
   }
 
   regex(path) {
